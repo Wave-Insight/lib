@@ -1,4 +1,4 @@
-mod structure;
+pub mod structure;
 // #[cfg(test)]
 
 
