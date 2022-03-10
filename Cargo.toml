@@ -5,11 +5,11 @@ edition = "2021"
 license = "Apache-2.0"
 authors = ["Junzhuo <zhou@junzhuo.me>"]
 description = "A efficient web-based wave viewer API"
-keywords = ["vcd", "wave-viewer", "http", "broswer-based"]
+keywords = ["VCD-Parser", "Waveform-Viewer", "Broswer-Based", "lib"]
 readme = "README.md"
 homepage = "https://wave-insight.io"
 repository = "https://github.com/Wave-Insight/lib"
-documentation = "https://docs.rs/wave-insight/"
+documentation = "https://docs.rs/crate/wave-insight-lib/latest"
 include = [
   "CHANGELOG.md",
   "LICENSE",
