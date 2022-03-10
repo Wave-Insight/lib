@@ -1,13 +1,13 @@
 [package]
 name = "wave-insight-lib"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 license = "Apache-2.0"
 authors = ["Junzhuo <zhou@junzhuo.me>"]
 description = "A efficient web-based wave viewer API"
 keywords = ["vcd", "wave-viewer", "http", "broswer-based"]
 readme = "README.md"
-homepage = "https://github.com/Wave-Insight"
+homepage = "https://wave-insight.io"
 repository = "https://github.com/Wave-Insight/lib"
 documentation = "https://docs.rs/wave-insight/"
 include = [
