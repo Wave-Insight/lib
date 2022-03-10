@@ -26,5 +26,7 @@ This crate parsers [VCD (Value Change Dump)][wp] files, a common format used wit
         3. 多根信号线bunch的定义, 多信号mapping多信号(bit-bit映射), bunch显示为1个单独的有明确含义的信号线并可以展开看每一个元素的情况, bunch可以继续组bunch
         4. 用户可以自定义数据格式
 
-- [ ] 实现一个类shell的交互环境, 可以使用指令`cd`, `ls`, `add xx(signal/module)`, `set_format xx(signal)`, `help`, `etc.`, 可以使用`-f file.wish` (Wave Insight Shell)指令预加载, 可以将
-,类似`PyMOL`的`script`https://pymolwiki.org/index.php/Simple_Scripting
+- [ ] 实现一个类shell的交互环境, 可以使用指令`cd`, `ls`, `add xx(signal/module)`, `set_format xx(signal)`, `help`, `etc.`, 可以使用`-f file.wish` (Wave Insight Shell)指令批量加载,类似`PyMOL`的`script`https://pymolwiki.org/index.php/Simple_Scripting, 可以将GUI的操作记录成`wish`并导出
+- [ ] cache文件保存
+- [ ] 支持打开 1.远程服务器中的波形文件 2.打开本地上传的波形文件 3.github/网盘的波形文件
+, 
