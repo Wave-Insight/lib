@@ -1,12 +1,13 @@
 use hashbrown::HashMap;
-mod serde_impl;
+use serde_derive::{Deserialize, Serialize};
 mod test;
-#[derive(Debug, PartialEq)]
+
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub struct Wire<'w> {
     pub id: usize,
     pub name: &'w str,
     pub size: usize,
-    pub refs: &'w str,
+    pub refs: [usize;2],
     pub modules_list: Vec<usize>,
 }
 impl<'w> Wire<'w> {
@@ -14,7 +15,7 @@ impl<'w> Wire<'w> {
         id: usize,
         name: &'w str,
         size: usize,
-        refs: &'w str,
+        refs: [usize;2],
         modules_list: Vec<usize>,
     ) -> Wire<'w> {
         Wire {
@@ -25,23 +26,21 @@ impl<'w> Wire<'w> {
             modules_list,
         }
     }
-    pub fn to_json_string(&self) -> String {
+    pub fn to_json(&self) -> String {
         serde_json::to_string(self).unwrap()
     }
-    pub fn from_json_str(json: &str) -> Wire {
+    pub fn from_json(json: &str) -> Wire {
         serde_json::from_str::<Wire>(json).unwrap()
     }
-    pub fn to_ron_string(&self) -> String {
-        // serde_json::to_string(self).unwrap()
-        ron::to_string(&self).unwrap()
+    pub fn to_bincode(&self)->Vec<u8>{
+        bincode::serde::encode_to_vec(&self, bincode::config::standard()).unwrap()
     }
-    pub fn from_ron_str(ron: &str) -> Wire {
-        // serde_json::from_str::<Wire>(json).unwrap()
-        ron::from_str(ron).unwrap()
+    pub fn from_bincode(bincode: &'w Vec<u8>) -> Wire<'w> {
+        bincode::serde::decode_borrowed_from_slice(&bincode[..], bincode::config::standard()).unwrap()
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub struct Module<'m> {
     pub id: usize,
     pub name: &'m str,
@@ -65,17 +64,17 @@ impl<'m> Module<'m> {
             wires_list,
         }
     }
-    pub fn to_json_string(&self) -> String {
+    pub fn to_json(&self) -> String {
         serde_json::to_string(self).unwrap()
     }
-    pub fn from_json_str(json: &str) -> Module {
+    pub fn from_json(json: &str) -> Module {
         serde_json::from_str::<Module>(json).unwrap()
     }
-    pub fn to_ron_string(&self) -> String {
-        ron::to_string(&self).unwrap()
+    pub fn to_bincode(&self)->Vec<u8>{
+        bincode::serde::encode_to_vec(&self, bincode::config::standard()).unwrap()
     }
-    pub fn from_ron_str(ron: &str) -> Module {
-        ron::from_str(ron).unwrap()
+    pub fn from_bincode(bincode: &'m Vec<u8>) -> Module<'m> {
+        bincode::serde::decode_borrowed_from_slice(&bincode[..], bincode::config::standard()).unwrap()
     }
 }
 
@@ -112,7 +111,7 @@ impl<'w, 'm, 'd> Constructor<'w, 'm, 'd> {
         wire_str_id: &'w str,
         wire_name: &'w str,
         wire_size: usize,
-        wire_refs: &'w str,
+        wire_refs: [usize;2],
     ) {
         match self.wires_id_map.get(wire_str_id) {
             Some(id) => {
@@ -178,14 +177,15 @@ impl<'w, 'm, 'd> Constructor<'w, 'm, 'd> {
         }
     }
 }
-// use std::io::Write;
-#[derive(Debug, PartialEq)]
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub struct Structure<'w, 'm, 'd> {
     pub filename: &'d str,
     pub version: &'d str,
     pub date: &'d str,
     pub timescale: &'d str,
+    #[serde(borrow)]
     pub all_wires: Vec<Wire<'w>>,
+    #[serde(borrow)]
     pub all_modules: Vec<Module<'m>>,
 }
 impl<'w, 'm, 'd> Structure<'w, 'm, 'd> {
@@ -220,19 +220,16 @@ impl<'w, 'm, 'd> Structure<'w, 'm, 'd> {
         }
     }
 
-    pub fn to_json_string(&self) -> String {
+    pub fn to_json(&self) -> String {
         serde_json::to_string(self).unwrap()
     }
-    pub fn from_json_str(json: &str) -> Structure {
+    pub fn from_json(json: &str) -> Structure {
         serde_json::from_str::<Structure>(json).unwrap()
     }
-    pub fn to_ron_string(&self) -> String {
-        ron::to_string(&self).unwrap()
+    pub fn to_bincode(&self)->Vec<u8>{
+        bincode::serde::encode_to_vec(&self, bincode::config::standard()).unwrap()
     }
-    pub fn from_ron_str(ron: &str) -> Structure {
-        ron::from_str(ron).unwrap()
+    pub fn from_bincode(bincode: &'w Vec<u8>) -> Structure<'w,'w,'w> {
+        bincode::serde::decode_borrowed_from_slice(&bincode[..], bincode::config::standard()).unwrap()
     }
-    // pub fn to_ron_writer(&self,writer:Write)->ron::Result<()>{
-    //     ron::ser::to_writer(self)
-    // }
 }

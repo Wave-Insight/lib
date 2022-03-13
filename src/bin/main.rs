@@ -1,3 +1,4 @@
+
 use wave_insight_lib::structure::Structure;
 fn main(){
     let mut constructor = Structure::new_constructor();
@@ -11,19 +12,19 @@ fn main(){
     let wire_id   = "'";
     let wire_name = "clk";
     let wire_size = 1;
-    let wire_refs = "";
+    let wire_refs = [0,0];
     constructor.new_wire(wire_id,wire_name,wire_size,wire_refs);
     // find new wire: io_state
     let wire_id   = "&";
     let wire_name = "io_state"; 
     let wire_size = 8;
-    let wire_refs = "[7:0]";
+    let wire_refs = [7,0];
     constructor.new_wire(wire_id,wire_name,wire_size,wire_refs);
     // find new wire: reset
     let wire_id   = "(";
     let wire_name = "reset"; 
     let wire_size = 1;
-    let wire_refs = "";
+    let wire_refs = [0,0];
     constructor.new_wire(wire_id,wire_name,wire_size,wire_refs);
     // find new submodule: MyTopLevel
     constructor.new_module("MyTopLevel");
@@ -31,13 +32,13 @@ fn main(){
     let wire_id   = "'";
     let wire_name = "clk"; 
     let wire_size = 1;
-    let wire_refs = "";
+    let wire_refs = [0,0];
     constructor.new_wire(wire_id,wire_name,wire_size,wire_refs);
     // find new wire: counter
     let wire_id   = ")";
     let wire_name = "counter"; 
     let wire_size = 8;
-    let wire_refs = "[7:0]";
+    let wire_refs = [7,0];
     constructor.new_wire(wire_id,wire_name,wire_size,wire_refs);
     // find End_Module
     constructor.end_module();
@@ -47,7 +48,7 @@ fn main(){
     let wire_id   = "'";
     let wire_name = "clk"; 
     let wire_size = 1;
-    let wire_refs = "";
+    let wire_refs = [0,0];
     constructor.new_wire(wire_id,wire_name,wire_size,wire_refs);
     // find End_Module
     constructor.end_module();
@@ -58,11 +59,11 @@ fn main(){
     println!();
     println!("{:?}",s);
     println!();
-    let ron = s.to_ron_string();
-    println!("{}",ron);
+    let bincode = s.to_bincode();
+    println!("{:?}",bincode);
     println!();
-    let s_from_ron = Structure::from_ron_str(&ron);
-    println!("{:?}",s_from_ron);
+    let s_from_bincode = Structure::from_bincode(&bincode);
+    println!("{:?}",s_from_bincode);
     println!();
-    assert_eq!(s,s_from_ron);
+    assert_eq!(s,s_from_bincode);
 }

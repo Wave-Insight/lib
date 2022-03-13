@@ -1,52 +1,52 @@
 mod wire {
     #[test]
-    fn json_str() {
+    fn json() {
         use super::super::Wire;
-        let w = Wire::new(1, "test", 2, "none", vec![1, 2, 3]);
+        let w = Wire::new(1, "test", 2, [0,0], vec![1, 2, 3]);
         println!("{:?}", w);
-        let json = w.to_json_string();
+        let json = w.to_json();
         println!("{}", json);
-        let w_j = Wire::from_json_str(&json);
+        let w_j = Wire::from_json(&json);
         println!("{:?}", w_j);
         assert_eq!(w, w_j);
     }
     #[test]
-    fn ron_str() {
+    fn bincode() {
         use super::super::Wire;
-        let w = Wire::new(1, "test", 2, "none", vec![1, 2, 3]);
+        let w = Wire::new(1, "test", 2, [0,0], vec![1, 2, 3]);
         println!("{:?}", w);
-        let ron = w.to_ron_string();
-        println!("{}", ron);
-        let w_j = Wire::from_ron_str(&ron);
-        println!("{:?}", w_j);
-        assert_eq!(w, w_j);
+        let bincode = w.to_bincode();
+        println!("{:?}", bincode);
+        let w_bincode = Wire::from_bincode(&bincode);
+        println!("{:?}", w_bincode);
+        assert_eq!(w, w_bincode);
     }
 }
 
 mod module {
 
     #[test]
-    fn json_str() {
+    fn json() {
         use super::super::Module;
         let m = Module::new(1, "test", vec![1, 2], vec![], vec![1, 2, 3]);
         println!("{:?}", m);
-        let json = m.to_json_string();
+        let json = m.to_json();
         println!("{}", json);
-        let m_j = Module::from_json_str(&json);
+        let m_j = Module::from_json(&json);
         println!("{:?}", m_j);
         assert_eq!(m, m_j);
     }
 
     #[test]
-    fn ron_str() {
+    fn bincode() {
         use super::super::Module;
         let m = Module::new(1, "test", vec![1, 2], vec![], vec![1, 2, 3]);
         println!("{:?}", m);
-        let ron = m.to_ron_string();
-        println!("{}", ron);
-        let m_r = Module::from_ron_str(&ron);
-        println!("{:?}", m_r);
-        assert_eq!(m, m_r);
+        let bincode = m.to_bincode();
+        println!("{:?}", bincode);
+        let m_bincode = Module::from_bincode(&bincode);
+        println!("{:?}", m_bincode);
+        assert_eq!(m, m_bincode);
     }
 }
 
@@ -65,19 +65,19 @@ mod structure {
         let wire_id = "'";
         let wire_name = "clk";
         let wire_size = 1;
-        let wire_refs = "";
+        let wire_refs = [0,0];
         constructor.new_wire(wire_id, wire_name, wire_size, wire_refs);
         // find new wire: io_state
         let wire_id = "&";
         let wire_name = "io_state";
         let wire_size = 8;
-        let wire_refs = "[7:0]";
+        let wire_refs = [7,0];
         constructor.new_wire(wire_id, wire_name, wire_size, wire_refs);
         // find new wire: reset
         let wire_id = "(";
         let wire_name = "reset";
         let wire_size = 1;
-        let wire_refs = "";
+        let wire_refs = [0,0];
         constructor.new_wire(wire_id, wire_name, wire_size, wire_refs);
         // find new submodule: MyTopLevel
         constructor.new_module("MyTopLevel");
@@ -85,13 +85,13 @@ mod structure {
         let wire_id = "'";
         let wire_name = "clk";
         let wire_size = 1;
-        let wire_refs = "";
+        let wire_refs = [0,0];
         constructor.new_wire(wire_id, wire_name, wire_size, wire_refs);
         // find new wire: counter
         let wire_id = ")";
         let wire_name = "counter";
         let wire_size = 8;
-        let wire_refs = "[7:0]";
+        let wire_refs = [7,0];
         constructor.new_wire(wire_id, wire_name, wire_size, wire_refs);
         // find End_Module
         constructor.end_module();
@@ -101,7 +101,7 @@ mod structure {
         let wire_id = "'";
         let wire_name = "clk";
         let wire_size = 1;
-        let wire_refs = "";
+        let wire_refs = [0,0];
         constructor.new_wire(wire_id, wire_name, wire_size, wire_refs);
         // find End_Module
         constructor.end_module();
@@ -118,24 +118,24 @@ mod structure {
     }
 
     #[test]
-    fn json_str() {
+    fn json() {
         let structure = from_constructor();
         println!("{:?}", structure);
-        let json = structure.to_json_string();
+        let json = structure.to_json();
         println!("{:?}", json);
-        let s_from_json = Structure::from_json_str(&json);
+        let s_from_json = Structure::from_json(&json);
         println!("{:?}", s_from_json);
         assert_eq!(structure, s_from_json)
     }
 
     #[test]
-    fn ron_str() {
+    fn bincode() {
         let structure = from_constructor();
         println!("{:?}", structure);
-        let ron = structure.to_ron_string();
-        println!("{:?}", ron);
-        let s_from_ron = Structure::from_ron_str(&ron);
-        println!("{:?}", s_from_ron);
-        assert_eq!(structure, s_from_ron)
+        let bincode = structure.to_bincode();
+        println!("{:?}", bincode);
+        let s_from_bincode = Structure::from_bincode(&bincode);
+        println!("{:?}", s_from_bincode);
+        assert_eq!(structure, s_from_bincode)
     }
 }
