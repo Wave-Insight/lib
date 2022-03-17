@@ -11,8 +11,8 @@ Structure {
     ], 
     all_modules: [
         Module { id: 0, name: "/", full_path: [0], submodules: [1], wires_list: [] }, 
-        Module { id: 1, name: "TOP", full_path: [0], submodules: [2, 3], wires_list: [0, 1, 2] }, 
-        Module { id: 2, name: "MyTopLevel", full_path: [0, 1], submodules: [], wires_list: [0, 3] }, 
-        Module { id: 3, name: "MyTest", full_path: [0, 1], submodules: [], wires_list: [0] }
+        Module { id: 1, name: "TOP", full_path: [0,1], submodules: [2, 3], wires_list: [0, 1, 2] }, 
+        Module { id: 2, name: "MyTopLevel", full_path: [0, 1,2], submodules: [], wires_list: [0, 3] }, 
+        Module { id: 3, name: "MyTest", full_path: [0, 1,3], submodules: [], wires_list: [0] }
     ] 
 }

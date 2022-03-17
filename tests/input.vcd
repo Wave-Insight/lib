@@ -16,3 +16,8 @@ $timescale   1ps $end
   $upscope $end
  $upscope $end
 $enddefinitions $end
+
+#0
+value1 wire1
+value2 wire2
+#10
