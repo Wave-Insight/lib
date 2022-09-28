@@ -1,5 +1,8 @@
 use hashbrown::HashMap;
 use serde_derive::{Deserialize, Serialize};
+use std::str::FromStr;
+use crate::log::InvalidData;
+
 // mod test;
 
 // /// Hello world example for Rust.
@@ -28,6 +31,101 @@ use serde_derive::{Deserialize, Serialize};
 //     }
 // }
 
+
+
+/// Hello world example for Rust.
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, Copy)]
+pub struct SignalBit {
+    /// Hello world example for Rust.
+    pub value: u8,
+}
+impl SignalBit {
+    const ZERO:u8 = 0;
+    const ONE:u8 = 1;
+    const Z:u8 = 2;
+    const X:u8 = 3;
+    /// New SignalBit 0
+    #[must_use]
+    #[inline]
+    pub fn zero() -> Self {
+        Self {
+            value: Self::ZERO,
+        }
+    }
+    /// new SignalBit 1
+    #[must_use]
+    #[inline]
+    pub fn one() -> Self {
+        Self {
+            value: Self::ONE,
+        }
+    }
+    /// new SignalBit Z
+    #[must_use]
+    #[inline]
+    pub fn z() -> Self {
+        Self {
+            value: Self::Z,
+        }
+    }
+    /// new SignalBit R
+    #[must_use]
+    #[inline]
+    pub fn x() -> Self {
+        Self {
+            value: Self::X,
+        }
+    }
+    /// Hello world example for Rust.
+    #[must_use]
+    #[inline]
+    pub fn to_string(&self) -> String {
+        let out = match self.value{
+            Self::ZERO=>"0",
+            Self::ONE=>"1",
+            Self::Z=>"Z",
+            Self::X=>"X",
+            _=>"X",
+        };
+        return String::from(out);
+    }
+    /// Hello world example for Rust.
+    #[must_use]
+    #[inline]
+    pub fn from_char(c: char) -> Self {
+        // let out = ' ';
+        match c{
+            '0'=>return Self::zero(),
+            '1'=>return Self::one(),
+            'z'|'Z'=>return Self::z(),
+            'x'|'X'=>return Self::x(),
+            _=>return Self::x(),
+        };
+    }
+    
+}
+
+/// Hello world example for Rust.
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
+pub struct WavePlot {
+    /// Hello world example for Rust.
+    pub x_time: Vec<usize>,
+    /// Hello world example for Rust.
+    pub y_wave: Vec<Vec<SignalBit>>,
+}
+impl WavePlot {
+    #[must_use]
+    #[inline]
+    /// Hello world example for Rust.
+    pub fn new(
+        size: usize,
+    ) -> Self {
+        Self{
+            x_time: vec![0],
+            y_wave: vec![vec![SignalBit::x(); size]],
+        }
+    }
+}
 /// Hello world example for Rust.
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub struct Wire {
@@ -36,7 +134,7 @@ pub struct Wire {
     /// Hello world example for Rust.
     pub name: String,
     /// Hello world example for Rust.
-    pub size: usize,
+    pub wave: WavePlot,
     /// Hello world example for Rust.
     pub refs: [usize; 2],
     /// Hello world example for Rust.
@@ -57,7 +155,7 @@ impl Wire {
         Self {
             id,
             name: String::from(name),
-            size,
+            wave: WavePlot::new(size),
             refs,
             modules_list,
         }
@@ -148,6 +246,39 @@ impl Module {
     #[inline]
     pub fn from_bincode(bincode: &[u8]) -> Self {
         bincode::serde::decode_borrowed_from_slice(bincode, bincode::config::standard()).unwrap()
+    }
+}
+
+/// A unit of time for the `$timescale` command.
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+pub enum TimescaleUnit {
+    /// S
+    S,
+    /// MS
+    MS,
+    /// US
+    US,
+    /// NS
+    NS,
+    /// PS
+    PS,
+    /// FS
+    FS,
+}
+
+impl FromStr for TimescaleUnit {
+    type Err = InvalidData;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        use TimescaleUnit::*;
+        match s {
+            "s" => Ok(S),
+            "ms" => Ok(MS),
+            "us" => Ok(US),
+            "ns" => Ok(NS),
+            "ps" => Ok(PS),
+            "fs" => Ok(FS),
+            _ => Err(InvalidData::new("invalid timescale unit")),
+        }
     }
 }
 /// Hello world example for Rust.
@@ -310,12 +441,6 @@ impl Structure {
     /// Hello world example for Rust.
     #[must_use]
     #[inline]
-    pub fn new_constructor() -> Constructor {
-        Constructor::init()
-    }
-    /// Hello world example for Rust.
-    #[must_use]
-    #[inline]
     pub fn to_json(&self) -> String {
         serde_json::to_string(self).unwrap()
     }
@@ -340,6 +465,7 @@ impl Structure {
 }
 
 /// Hello world example for Rust.
+#[cfg(test)]
 mod test {
     /// Hello world example for Rust.
     mod wire {
@@ -395,11 +521,14 @@ mod test {
     }
     /// Hello world example for Rust.
     mod structure {
+        use crate::structure::Constructor;
+
         use super::super::Structure;
         /// Hello world example for Rust.
         #[allow(dead_code)]
         fn from_constructor() -> Structure {
-            let mut constructor = Structure::new_constructor();
+            // let mut constructor = Structure::new_constructor();
+            let mut constructor = Constructor::init();
             constructor.set_filename("input.vcd");
             constructor.set_version("Generated by VerilatedVcd");
             constructor.set_date("Mon Mar  7 16:03:36 2022");

@@ -47,5 +47,26 @@
 /*!
 # Hello world example for Rust.
 */
+
+/// Hello world example for Rust.
+pub mod wish;
+/// Hello world example for Rust.
+pub mod log;
 /// Hello world example for Rust.
 pub mod structure;
+/// Hello world example for Rust.
+pub mod parser;
+
+/// Hello world example for Rust.
+#[derive(Debug)]
+pub struct AppContext { 
+    structure: Option<structure::Structure>,
+}
+impl AppContext {
+    /// Hello world example for Rust.
+    pub fn new() -> Self{
+        Self{ 
+            structure: None
+        }
+    }
+}
