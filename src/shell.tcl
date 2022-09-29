@@ -3,6 +3,6 @@
 # triple x
 #
 # Triples the given value.
-proc triple {x} {
-    expr {3*$x}
-}
+# proc triple {x} {
+#     expr {3*$x}
+# }

@@ -1,6 +1,6 @@
 // use molt::{Interp, ContextID, Value};
 // use molt::check_args;
-// use molt::molt_ok;
+use molt::{molt_ok,molt_err};
 use molt::Interp;
 use molt::types::*;
 
@@ -79,9 +79,7 @@ pub fn help(app_shell: &mut Interp, app_id: ContextID) {
 #[inline]
 pub fn prompt(app_shell: &mut Interp, app_id: ContextID) -> Result<&str, Exception> {
     let _ = app_shell.context::<AppContext>(app_id);
-    let prompt = "tcl1> ";
-
-    // app_shell.set_var(&Value::from("tcl_prompt1"), Value::from(format!("return \"{}\"",prompt)))?;
+    let prompt = "tcl > ";
     Ok(prompt)
 }
 
@@ -89,13 +87,15 @@ pub fn prompt(app_shell: &mut Interp, app_id: ContextID) -> Result<&str, Excepti
 /// 
 /// Open a .vcd (Value Change Dump) file, see Chapter 18 of [IEEE Std 1364™-2005](https://www.eg.bucknell.edu/~csci320/2016-fall/wp-content/uploads/2015/08/verilog-std-1364-2005.pdf)
 #[inline]
-pub fn open_vcd(app_shell: &mut Interp, app_id: ContextID, file_path: &str) {
+pub fn open_vcd(app_shell: &mut Interp, app_id: ContextID, file_path: &str) -> MoltResult {
     let app = app_shell.context::<AppContext>(app_id);
     match crate::parser::vcd(file_path) {
         Ok(c) => {
             app.data_structure = Some(c.structure);
-            println!("ok")
+            molt_ok!("ok")
         },
-        Err(e) => eprintln!(" **error** {}: {}",e, file_path),
+        Err(e) => molt_err!(
+            "error * {}: {}",file_path,e
+        ),
     }
 }

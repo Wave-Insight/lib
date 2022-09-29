@@ -1,10 +1,10 @@
 //! Sample Molt Extension
 //! WISH: Wave-Insight Shell 
-use molt::check_args;
-use molt::molt_ok;
+use colored::Colorize;
+// use molt::check_args;
+use molt::{molt_ok,molt_err};
 use molt::Interp;
 use molt::types::*;
-
 use crate::app;
 use crate::app::AppContext;
 use crate::app::greeting;
@@ -78,10 +78,9 @@ fn cmd_version(app_shell: &mut Interp, app_id: ContextID, _: &[Value]) -> MoltRe
 #[inline]
 fn cmd_open_vcd(app_shell: &mut Interp, app_id: ContextID, argv: &[Value]) -> MoltResult {
     // Correct number of arguments?
-    let _ = check_args(1, argv, 2, 2, "value")?;
+    let _ = check_args(1, argv, 2, 2, "input_file")?;
     let file_path = argv[1].as_str();
-    app::open_vcd(app_shell, app_id, file_path);
-    molt_ok!()
+    app::open_vcd(app_shell, app_id, remove_quotes(file_path))
 }
 #[inline]
 fn cmd_test(app_shell: &mut Interp, app_id: ContextID, _: &[Value]) -> MoltResult {
@@ -90,3 +89,42 @@ fn cmd_test(app_shell: &mut Interp, app_id: ContextID, _: &[Value]) -> MoltResul
     molt_ok!()
 }
 
+/// Remove Beginning and Ending Double/Single Quotes:
+/// open_vcd "tests/input.vcd" <-> open_vcd 'tests/input.vcd' <-> open_vcd tests/input.vcd
+#[inline]
+fn remove_quotes(content:&str)-> &str{
+    let mut content = content;
+    if content.len() >= 2{
+        let first = content.chars().nth(0);
+        let last = content.chars().nth(content.len()-1);
+        if first == last && (first == Some('\'') || first == Some('\"')){
+            if let Some(content_) = content.get(1..content.len()-1){
+                content = content_;
+            }
+        }
+    }
+    return content
+}
+/// Overwrite check_args
+pub fn check_args(
+    namec: usize,
+    argv: &[Value],
+    min: usize,
+    max: usize,
+    argsig: &str,
+) -> MoltResult {
+    assert!(namec >= 1);
+    assert!(min >= 1);
+    assert!(!argv.is_empty());
+
+    if argv.len() < min || (max > 0 && argv.len() > max) {
+        let cmd_tokens = Value::from(&argv[0..namec]);
+        molt_err!(
+            "wrong # args: should be \"{} {}\"",
+            cmd_tokens.to_string(),
+            argsig.bold().italic()
+        )
+    } else {
+        molt_ok!()
+    }
+}
