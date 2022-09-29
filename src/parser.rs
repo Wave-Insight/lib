@@ -39,20 +39,20 @@ use crate::structure::Constructor;
 //     ]
 // }
 
-// fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
+// fn read_lines<P>(file_path: P) -> io::Result<io::Lines<io::BufReader<File>>>
 // where P: AsRef<Path>, {
-//     let file = File::open(filename)?;
+//     let file = File::open(file_path)?;
 //     Ok(io::BufReader::new(file).lines())
 // }
 
 /// Hello world example for Rust.
-pub fn vcd<P>(filename: P) -> io::Result<Constructor>
+pub fn vcd<P>(file_path: P) -> io::Result<Constructor>
 where P: AsRef<Path>, {
     let mut line_num:usize = 0;
     let mut buf:Vec<String> = Vec::new();
     let mut constructor = Constructor::init();
-    // constructor.set_filename(filename.);
-    let file = File::open(filename)?;
+    // constructor.set_file_path(file_path.);
+    let file = File::open(file_path)?;
     let lines = io::BufReader::new(file).lines();
     for line in lines{
         line_num +=1;

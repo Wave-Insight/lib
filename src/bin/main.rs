@@ -48,24 +48,25 @@
 
 //! Hello world example for Rust.
 // use wave_insight_lib::structure::{Structure, Constructor};
-use wave_insight_lib::wish;
-use wave_insight_lib::AppContext;
+use wave_insight_lib::shell;
+use wave_insight_lib::app::AppContext;
+
+
 fn main() {
     use std::env;
     // FIRST, get the command line arguments.
     let args: Vec<String> = env::args().collect();
     // NEXT, create and initialize the interpreter.
     // let mut interp = Interp::new();
-    let mut wish = wish::new();
-    let id = wish.save_context(AppContext::new());
+    let mut wish = shell::new();
+    let app_id = wish.save_context(AppContext::new());
+    // NOTE: commands can be added to the interpreter here.
 
-    // // NOTE: commands can be added to the interpreter here.
-
-    // // Add a command defined in this file.
+    // Add a command defined in this file.
     // interp.add_command("square", cmd_square);
-
+    
     // Install a Molt extension crate
-    let _ = wish::install(&mut wish,id).expect("Could not install.");
+    let _ = shell::install(&mut wish,app_id).expect(" **error** Could not install.");
     // NEXT, evaluate the file, if any.
     if args.len() > 1 {
         molt_shell::script(&mut wish, &args[1..]);
