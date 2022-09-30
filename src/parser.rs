@@ -48,10 +48,23 @@ use crate::structure::Constructor;
 /// Hello world example for Rust.
 pub fn vcd<P>(file_path: P) -> io::Result<Constructor>
 where P: AsRef<Path>, {
+    fn buf_to_string(buf: &[String]) -> String{
+        let mut out = String::new();
+        for word in buf{
+            if out.is_empty(){
+                out = format!("{}",word);
+            } else {
+                out = format!("{} {}",out, word);
+            }
+        };
+        out
+    }
     let mut line_num:usize = 0;
     let mut buf:Vec<String> = Vec::new();
     let mut constructor = Constructor::init();
-    // constructor.set_file_path(file_path.);
+    if let Some(file_path) = file_path.as_ref().to_str(){
+        constructor.set_file_path(file_path);
+    };
     let file = File::open(file_path)?;
     let lines = io::BufReader::new(file).lines();
     for line in lines{
@@ -61,9 +74,15 @@ where P: AsRef<Path>, {
             for word in word_list{
                 if word == "$end"{
                     match buf[0] {
-                        _ if buf[0] == "$version" => constructor.set_version("aaa"),
-                        _ if buf[0] == "$date" => constructor.set_date("bbb"),
-                        _ if buf[0] == "$timescale" => constructor.set_timescale("ccc"),
+                        _ if buf[0] == "$version" => {
+                            constructor.set_version(&buf_to_string(&buf[1..]));
+                        },
+                        _ if buf[0] == "$date" => {
+                            constructor.set_date(&buf_to_string(&buf[1..]));
+                        },
+                        _ if buf[0] == "$timescale" => {
+                            constructor.set_timescale(&buf_to_string(&buf[1..]))
+                        },
                         _ if buf[0] == "$scope" => {
                             if buf[1] == "module"{
                                 let name = &buf[2];
@@ -84,7 +103,7 @@ where P: AsRef<Path>, {
                                 };
                             };
                         },
-                        _ if buf[0] == "$enddefinitions" => constructor.set_version("aaa"),
+                        _ if buf[0] == "$enddefinitions" => (),
                         _ => println!("Unknown Token {}, line {}", buf[0], line_num)
                     }
                     buf.clear();
@@ -97,11 +116,12 @@ where P: AsRef<Path>, {
     return Ok(constructor);
 }
 
+
 mod test {
     mod parser {
         #[test]
         fn tt(){
-            let c = crate::parser::vcd("/Users/junzhuo/Developer/Wave-Insight/lib/tests/input.vcd");
+            let c = crate::parser::vcd("tests/input.vcd");
             print!("{:?}",c)
         }
     }
