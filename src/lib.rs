@@ -49,7 +49,7 @@
 */
 
 /// Hello world example for Rust.
-pub mod shell;
+pub mod wish;
 /// Hello world example for Rust.
 pub mod log;
 /// Hello world example for Rust.

@@ -42,6 +42,7 @@ molt = "0.3.1"
 molt-shell = "0.3.1"
 build-time = "0.1.2"
 colored = "2.0.0"
+clap = "4.0.4"
 # TCL
 # molt = "0.3.1"
 # [badges]

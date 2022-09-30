@@ -48,29 +48,31 @@
 
 //! Hello world example for Rust.
 // use wave_insight_lib::structure::{Structure, Constructor};
-use wave_insight_lib::shell;
-use wave_insight_lib::app::AppContext;
+// use wave_insight_lib::shell;
+// use wave_insight_lib::app::INFO;
+use wave_insight_lib::app::App;
+// use clap::{Arg, App};
+// use clap::{Arg, Command};
 
 
 fn main() {
-    use std::env;
-    // FIRST, get the command line arguments.
-    let args: Vec<String> = env::args().collect();
-    // NEXT, create and initialize the interpreter.
-    // let mut interp = Interp::new();
-    let mut wish = shell::new();
-    let app_id = wish.save_context(AppContext::new());
-    // NOTE: commands can be added to the interpreter here.
-
-    // Add a command defined in this file.
-    // interp.add_command("square", cmd_square);
-    
-    // Install a Molt extension crate
-    let _ = shell::install(&mut wish,app_id).expect(" **error** Could not install.");
+    // let (mut app_shell, app_id) = shell::init();
+    let mut app = App::init();
+    app.greeting();
+    // let matches = cmd.get_matches();
+    // if let Some(file_path) = matches.get_one::<String>("input_file"){
+    //     let _ = app.open_vcd(file_path);
+    // }
+    // if let Some(file_path) = matches.get_one::<String>("tcl_script"){
+    //     // let _ = app::open_vcd(&mut app_shell, app_id, file_path);
+    //     app.shell.script(&vec![file_path.to_owned()][0..]);
+    // }
     // NEXT, evaluate the file, if any.
-    if args.len() > 1 {
-        molt_shell::script(&mut wish, &args[1..]);
-    } else {
-        molt_shell::repl(&mut wish);
-    }
+
+    // if args.len() > 1 {
+    //     molt_shell::script(&mut app_shell, &args[1..]);
+    // } else {
+    // }
+    app.matech();
+    app.shell.repl();
 }
