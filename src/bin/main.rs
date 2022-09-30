@@ -19,9 +19,7 @@
     unused_qualifications,
     unused_results, // TODO: fix unused results
     variant_size_differences,
-
     warnings, // treat all wanings as errors
-
     clippy::all,
     clippy::restriction,
     clippy::pedantic,
@@ -47,32 +45,13 @@
 // #![deny(missing_docs)]
 
 //! Hello world example for Rust.
-// use wave_insight_lib::structure::{Structure, Constructor};
-// use wave_insight_lib::shell;
-// use wave_insight_lib::app::INFO;
 use wave_insight_lib::app::App;
-// use clap::{Arg, App};
-// use clap::{Arg, Command};
 
 
 fn main() {
     // let (mut app_shell, app_id) = shell::init();
     let mut app = App::init();
+    app.matech_args();
     app.greeting();
-    // let matches = cmd.get_matches();
-    // if let Some(file_path) = matches.get_one::<String>("input_file"){
-    //     let _ = app.open_vcd(file_path);
-    // }
-    // if let Some(file_path) = matches.get_one::<String>("tcl_script"){
-    //     // let _ = app::open_vcd(&mut app_shell, app_id, file_path);
-    //     app.shell.script(&vec![file_path.to_owned()][0..]);
-    // }
-    // NEXT, evaluate the file, if any.
-
-    // if args.len() > 1 {
-    //     molt_shell::script(&mut app_shell, &args[1..]);
-    // } else {
-    // }
-    app.matech();
-    app.shell.repl();
+    app.wish.repl();
 }

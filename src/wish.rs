@@ -1,5 +1,6 @@
 //! Sample Molt Extension
 //! shell: Wave-Insight Shell 
+use std::process;
 use colored::Colorize;
 use molt::{molt_ok,molt_err};
 use molt::Interp;
@@ -61,6 +62,8 @@ pub struct Wish{
     pub shell: Interp,
     /// Print greeting infomation
     pub ctx_id: ContextID,
+    /// Print greeting infomation
+    pub have_greeting: bool,
 }
 impl Wish {
     /// Install the extension's commands into the Interp.
@@ -70,7 +73,11 @@ impl Wish {
         for command in COMMANDS {
             shell.add_context_command(command.name, command.func.to_owned(),ctx_id);
         }
-        shell.set_var(&Value::from("tcl_prompt1"), Value::from("return \"[prompt]\"")).expect("error * Could not install.");
+        if let Ok(_)=shell.set_var(&Value::from("tcl_prompt1"), Value::from("return \"[prompt]\"")){
+        }else{
+            eprintln!("{} Could not install.", "error:".red().bold());
+            process::exit(1);
+        }
         // app::greeting();
         // NEXT, load the extension's Tcl code
         if let Err(exception) = shell.eval(include_str!("shell.tcl")) {
@@ -78,7 +85,8 @@ impl Wish {
         }
         return Self { 
             shell,
-            ctx_id
+            ctx_id,
+            have_greeting:false,
         }
     }
     /// Install the extension's commands into the Interp.
@@ -154,9 +162,10 @@ pub fn check_args(
     if argv.len() < min || (max > 0 && argv.len() > max) {
         let cmd_tokens = Value::from(&argv[0..namec]);
         molt_err!(
-            "wrong # args: should be \"{} {}\"",
+            "{} Args should be \"{} {}\"",
+            "wrong:".bold().red(),
             cmd_tokens.to_string(),
-            argsig.bold().italic()
+            argsig.bold().italic(),
         )
     } else {
         molt_ok!()
