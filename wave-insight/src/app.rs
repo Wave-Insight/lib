@@ -160,18 +160,6 @@ impl AppContext {
     }
 }
 
-
-
-/// # prompt
-/// 
-/// Change prompt
-#[inline]
-pub fn prompt(app_shell: &mut Interp, app_id: ContextID) -> Result<&str, Exception> {
-    let _ = app_shell.context::<AppContext>(app_id);
-    let prompt = "wish > ";
-    Ok(prompt)
-}
-
 /// # open_vcd
 /// 
 /// Open a .vcd (Value Change Dump) file, see Chapter 18 of [IEEE Std 1364™-2005](https://www.eg.bucknell.edu/~csci320/2016-fall/wp-content/uploads/2015/08/verilog-std-1364-2005.pdf)
