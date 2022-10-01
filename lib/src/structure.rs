@@ -1,4 +1,3 @@
-use colored::Colorize;
 use hashbrown::HashMap;
 use serde_derive::{Deserialize, Serialize};
 use std::str::FromStr;
@@ -273,15 +272,17 @@ impl Constructor {
     }
     /// Hello world example for Rust.
     #[inline]
-    pub fn end_module(&mut self) {
+    pub fn end_module(&mut self) -> Result<(),InvalidData>{
         match self.structure.all_modules[self.curr_module_id].full_path[..] {
-            [.., sceond_last_id, _] => self.curr_module_id = sceond_last_id,
-            _ => panic!(
-                "{} Can not end from module \"{}\", it is TOP module.",
-                "error:".bold().red(),
+            [.., sceond_last_id, _] => {
+                self.curr_module_id = sceond_last_id;
+                Ok(())
+            },
+            _ => return Err(InvalidData::new(format!(
+                "Can not end from module \"{}\", it is TOP module.",
                 self.curr_module().name
-            ),
-        };
+            )))
+        }
     }
     /// Hello world example for Rust.
     pub fn add_wave(&mut self, wire_str_id: &str, x_time: usize, vector: &str) -> Result<(),InvalidData>{
@@ -472,7 +473,7 @@ mod test {
                 constructor.new_wire(wire_id, wire_name, wire_size, wire_refs);
             }
             // find End_Module
-            constructor.end_module();
+            let _ = constructor.end_module();
             // find new submodule: MyTest
             constructor.new_module("MyTest");
             // find new wire: clk
@@ -484,9 +485,9 @@ mod test {
                 constructor.new_wire(wire_id, wire_name, wire_size, wire_refs);
             }
             // find End_Module
-            constructor.end_module();
+            let _ = constructor.end_module();
             // find End_Module
-            constructor.end_module();
+            let _ = constructor.end_module();
             constructor.structure
             // Structure::from_constructor(&constructor)
         }

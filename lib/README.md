@@ -11,7 +11,8 @@ This crate parsers [VCD (Value Change Dump)][wp] files, a common format used wit
 ## TODO
 - [x] Define `structure::Structure`
 - [x] Implement `Deserialize`&`Serialize` for `structure::wire::Wire`&`structure::module::Module`
-- [ ] Parser `.vcd` files
+- [x] Parser `.vcd` files
+- [x] Tcl shell embedded
 - [ ] `Websocket`, `wasm`
 - [ ] Canvas line-chart
 - [ ] Data Format: `TureFalse`, `Binary`, `Octonary`, `Hexadecimal`, 
@@ -29,4 +30,3 @@ This crate parsers [VCD (Value Change Dump)][wp] files, a common format used wit
 - [ ] 实现一个类shell的交互环境, 可以使用指令`cd`, `ls`, `add xx(signal/module)`, `set_format xx(signal)`, `help`, `etc.`, 可以使用`-f file.wish` (Wave Insight Shell)指令批量加载,类似`PyMOL`的`script`https://pymolwiki.org/index.php/Simple_Scripting, 可以将GUI的操作记录成`wish`并导出
 - [ ] cache文件保存
 - [ ] 支持打开 1.远程服务器中的波形文件 2.打开本地上传的波形文件 3.github/网盘的波形文件
-, 

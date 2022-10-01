@@ -49,7 +49,7 @@
 */
 
 /// Hello world example for Rust.
-pub mod wish;
+// pub mod wish;
 /// Hello world example for Rust.
 pub mod log;
 /// Hello world example for Rust.
@@ -58,6 +58,3 @@ pub mod structure;
 pub mod wave;
 /// Hello world example for Rust.
 pub mod parser;
-
-/// Hello world example for Rust.
-pub mod app;

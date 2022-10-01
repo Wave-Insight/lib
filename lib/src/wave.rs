@@ -1,4 +1,3 @@
-use colored::Colorize;
 use serde_derive::{Deserialize, Serialize};
 use std::fmt::{self, Debug};
 use bitvec::macros::internal::funty::Fundamental;
@@ -243,7 +242,7 @@ impl Debug for WavePlot {
                 write!(
                     f,
                     "WavePlot {{{} {:?}}}",
-                    "error: ".bold().red(),
+                    "error: ",
                     e
                 )
             },

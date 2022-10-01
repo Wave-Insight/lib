@@ -2,7 +2,6 @@
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
-use colored::Colorize;
 
 use crate::structure::Constructor;
 // fn lut(d:u8)->[&u8;4]{
@@ -88,7 +87,7 @@ where P: AsRef<Path>, {
                                 }
                             },
                             _ if buf[0] == "$upscope" => {
-                                constructor.end_module();
+                                constructor.end_module()?;
                             },
                             _ if buf[0] == "$var" => {
                                 if buf[1] == "wire"{
@@ -117,7 +116,7 @@ where P: AsRef<Path>, {
                             if let Ok(t) = &word[1..].parse::<usize>(){
                                 x_time = t.clone();
                             }else{
-                                println!("{} Can NOT parse {}, line {}", "error: ".red().bold() ,word, line_num)
+                                println!("{} Can NOT parse {}, line {}", "error: ", word, line_num)
                             };
                         },
                         Some('b')|Some('B') => {
@@ -125,7 +124,7 @@ where P: AsRef<Path>, {
                             vector = word[1..].to_owned();
                         },
                         Some('r')|Some('R') => {
-                            println!("{} NOT srupport REAL number {}, line {}", "error: ".red().bold() ,word, line_num)
+                            println!("{} NOT srupport REAL number {}, line {}", "error: ", word, line_num)
                         },
                         Some(_) => {
                             if is_vector {
