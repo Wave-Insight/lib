@@ -2,14 +2,15 @@ use std::fmt::{self, Display};
 use std::error::Error;
 use std::io;
 /// Error wrapping a static string message explaining why parsing failed.
-#[derive(Debug,Clone,Copy)]
-pub struct InvalidData(&'static str);
+#[derive(Debug,Clone)]
+pub struct InvalidData(String);
 impl InvalidData {
     /// Error wrapping a static string message explaining why parsing failed.
-    pub fn new(c: &'static str) -> Self {
+    pub fn new(c: String) -> Self {
         Self(c)
     }
 }
+
 impl Display for InvalidData {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         self.0.fmt(f)
@@ -17,7 +18,7 @@ impl Display for InvalidData {
 }
 impl Error for InvalidData {
     fn description(&self) -> &str {
-        self.0
+        &self.0
     }
 }
 impl From<InvalidData> for io::Error {

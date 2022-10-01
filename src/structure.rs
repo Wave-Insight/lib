@@ -1,7 +1,7 @@
 use hashbrown::HashMap;
 use serde_derive::{Deserialize, Serialize};
 use std::str::FromStr;
-use crate::log::InvalidData;
+use crate::{log::InvalidData, wave::WavePlot};
 
 // mod test;
 
@@ -33,99 +33,80 @@ use crate::log::InvalidData;
 
 
 
-/// Hello world example for Rust.
-#[derive(Serialize, Deserialize, PartialEq, Debug, Clone, Copy)]
-pub struct SignalBit {
-    /// Hello world example for Rust.
-    pub value: u8,
-}
-impl SignalBit {
-    const ZERO:u8 = 0;
-    const ONE:u8 = 1;
-    const Z:u8 = 2;
-    const X:u8 = 3;
-    /// New SignalBit 0
-    #[must_use]
-    #[inline]
-    pub fn zero() -> Self {
-        Self {
-            value: Self::ZERO,
-        }
-    }
-    /// new SignalBit 1
-    #[must_use]
-    #[inline]
-    pub fn one() -> Self {
-        Self {
-            value: Self::ONE,
-        }
-    }
-    /// new SignalBit Z
-    #[must_use]
-    #[inline]
-    pub fn z() -> Self {
-        Self {
-            value: Self::Z,
-        }
-    }
-    /// new SignalBit R
-    #[must_use]
-    #[inline]
-    pub fn x() -> Self {
-        Self {
-            value: Self::X,
-        }
-    }
-    /// Hello world example for Rust.
-    #[must_use]
-    #[inline]
-    pub fn to_string(&self) -> String {
-        let out = match self.value{
-            Self::ZERO=>"0",
-            Self::ONE=>"1",
-            Self::Z=>"Z",
-            Self::X=>"X",
-            _=>"X",
-        };
-        return String::from(out);
-    }
-    /// Hello world example for Rust.
-    #[must_use]
-    #[inline]
-    pub fn from_char(c: char) -> Self {
-        // let out = ' ';
-        match c{
-            '0'=>return Self::zero(),
-            '1'=>return Self::one(),
-            'z'|'Z'=>return Self::z(),
-            'x'|'X'=>return Self::x(),
-            _=>return Self::x(),
-        };
-    }
-    
-}
 
-/// Hello world example for Rust.
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
-pub struct WavePlot {
-    /// Hello world example for Rust.
-    pub x_time: Vec<usize>,
-    /// Hello world example for Rust.
-    pub y_wave: Vec<Vec<SignalBit>>,
-}
-impl WavePlot {
-    #[must_use]
-    #[inline]
-    /// Hello world example for Rust.
-    pub fn new(
-        size: usize,
-    ) -> Self {
-        Self{
-            x_time: vec![0],
-            y_wave: vec![vec![SignalBit::x(); size]],
-        }
-    }
-}
+// /// Hello world example for Rust.
+// #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, Copy)]
+// pub struct SignalBit {
+//     /// Hello world example for Rust.
+//     pub value: u8,
+// }
+// impl SignalBit {
+//     const ZERO:u8 = 0;
+//     const ONE:u8 = 1;
+//     const Z:u8 = 2;
+//     const X:u8 = 3;
+//     /// New SignalBit 0
+//     #[must_use]
+//     #[inline]
+//     pub fn zero() -> Self {
+//         Self {
+//             value: Self::ZERO,
+//         }
+//     }
+//     /// new SignalBit 1
+//     #[must_use]
+//     #[inline]
+//     pub fn one() -> Self {
+//         Self {
+//             value: Self::ONE,
+//         }
+//     }
+//     /// new SignalBit Z
+//     #[must_use]
+//     #[inline]
+//     pub fn z() -> Self {
+//         Self {
+//             value: Self::Z,
+//         }
+//     }
+//     /// new SignalBit R
+//     #[must_use]
+//     #[inline]
+//     pub fn x() -> Self {
+//         Self {
+//             value: Self::X,
+//         }
+//     }
+//     /// Hello world example for Rust.
+//     #[must_use]
+//     #[inline]
+//     pub fn to_string(&self) -> String {
+//         let out = match self.value{
+//             Self::ZERO=>"0",
+//             Self::ONE=>"1",
+//             Self::Z=>"Z",
+//             Self::X=>"X",
+//             _=>"X",
+//         };
+//         return String::from(out);
+//     }
+//     /// Hello world example for Rust.
+//     #[must_use]
+//     #[inline]
+//     pub fn from_char(c: char) -> Self {
+//         // let out = ' ';
+//         match c{
+//             '0'=>return Self::zero(),
+//             '1'=>return Self::one(),
+//             'z'|'Z'=>return Self::z(),
+//             'x'|'X'=>return Self::x(),
+//             _=>return Self::x(),
+//         };
+//     }
+    
+// }
+
+
 /// Hello world example for Rust.
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub struct Wire {
@@ -280,7 +261,7 @@ impl FromStr for TimescaleUnit {
             "ns" => Ok(NS),
             "ps" => Ok(PS),
             "fs" => Ok(FS),
-            _ => Err(InvalidData::new("invalid timescale unit")),
+            _ => Err(InvalidData::new(format!("invalid timescale unit"))),
         }
     }
 }
@@ -604,6 +585,11 @@ mod test {
         fn constructor() {
             let structure = from_constructor();
             println!("{:?}", structure);
+        }
+        #[test]
+        fn get_lut() {
+            // let structure = from_constructor();
+            println!("{:?}", "structure");
         }
 
         #[test]

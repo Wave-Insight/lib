@@ -55,8 +55,9 @@ pub mod log;
 /// Hello world example for Rust.
 pub mod structure;
 /// Hello world example for Rust.
+pub mod wave;
+/// Hello world example for Rust.
 pub mod parser;
 
 /// Hello world example for Rust.
 pub mod app;
-
