@@ -1,111 +1,9 @@
+use colored::Colorize;
 use hashbrown::HashMap;
 use serde_derive::{Deserialize, Serialize};
 use std::str::FromStr;
+use anyhow::Result;
 use crate::{log::InvalidData, wave::WavePlot};
-
-// mod test;
-
-// /// Hello world example for Rust.
-// pub trait Bincode<'de> where Self:Sized + serde::Serialize + serde::Deserialize<'de> {
-//     /// Hello world example for Rust.
-//     #[inline]
-//     fn to_json(&self) -> String {
-//         serde_json::to_string(self).unwrap()
-//     }
-//     /// Hello world example for Rust.
-//     #[inline]
-//     #[must_use]
-//     fn from_json(json: &'de str) -> Self {
-//         serde_json::from_str::<Self>(json).unwrap()
-//     }
-//     /// Hello world example for Rust.
-//     #[inline]
-//     fn to_bincode(&self)->Vec<u8>{
-//         bincode::serde::encode_to_vec(&self, bincode::config::standard()).unwrap()
-//     }
-//     /// Hello world example for Rust.
-//     #[inline]
-//     #[must_use]
-//     fn from_bincode(bincode: &'de [u8]) -> Self {
-//         bincode::serde::decode_borrowed_from_slice(bincode, bincode::config::standard()).unwrap()
-//     }
-// }
-
-
-
-
-// /// Hello world example for Rust.
-// #[derive(Serialize, Deserialize, PartialEq, Debug, Clone, Copy)]
-// pub struct SignalBit {
-//     /// Hello world example for Rust.
-//     pub value: u8,
-// }
-// impl SignalBit {
-//     const ZERO:u8 = 0;
-//     const ONE:u8 = 1;
-//     const Z:u8 = 2;
-//     const X:u8 = 3;
-//     /// New SignalBit 0
-//     #[must_use]
-//     #[inline]
-//     pub fn zero() -> Self {
-//         Self {
-//             value: Self::ZERO,
-//         }
-//     }
-//     /// new SignalBit 1
-//     #[must_use]
-//     #[inline]
-//     pub fn one() -> Self {
-//         Self {
-//             value: Self::ONE,
-//         }
-//     }
-//     /// new SignalBit Z
-//     #[must_use]
-//     #[inline]
-//     pub fn z() -> Self {
-//         Self {
-//             value: Self::Z,
-//         }
-//     }
-//     /// new SignalBit R
-//     #[must_use]
-//     #[inline]
-//     pub fn x() -> Self {
-//         Self {
-//             value: Self::X,
-//         }
-//     }
-//     /// Hello world example for Rust.
-//     #[must_use]
-//     #[inline]
-//     pub fn to_string(&self) -> String {
-//         let out = match self.value{
-//             Self::ZERO=>"0",
-//             Self::ONE=>"1",
-//             Self::Z=>"Z",
-//             Self::X=>"X",
-//             _=>"X",
-//         };
-//         return String::from(out);
-//     }
-//     /// Hello world example for Rust.
-//     #[must_use]
-//     #[inline]
-//     pub fn from_char(c: char) -> Self {
-//         // let out = ' ';
-//         match c{
-//             '0'=>return Self::zero(),
-//             '1'=>return Self::one(),
-//             'z'|'Z'=>return Self::z(),
-//             'x'|'X'=>return Self::x(),
-//             _=>return Self::x(),
-//         };
-//     }
-    
-// }
-
 
 /// Hello world example for Rust.
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
@@ -379,10 +277,22 @@ impl Constructor {
         match self.structure.all_modules[self.curr_module_id].full_path[..] {
             [.., sceond_last_id, _] => self.curr_module_id = sceond_last_id,
             _ => panic!(
-                "ERROR: Can not end from module \"{}\", it is TOP module.",
+                "{} Can not end from module \"{}\", it is TOP module.",
+                "error:".bold().red(),
                 self.curr_module().name
             ),
         };
+    }
+    /// Hello world example for Rust.
+    pub fn add_wave(&mut self, wire_str_id: &str, x_time: usize, vector: &str) -> Result<(),InvalidData>{
+        if let Some(id) = self.wires_id_map.get(wire_str_id){
+            self.structure.all_wires[*id].wave.add_wave(x_time, vector)?;
+        } else {
+            return Err(InvalidData::new(format!(
+                "Can not find wire_str_id: {}",vector
+            )));
+        };
+        Ok(())
     }
 }
 /// Hello world example for Rust.

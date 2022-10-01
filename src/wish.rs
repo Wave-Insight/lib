@@ -1,5 +1,7 @@
 //! Sample Molt Extension
 //! shell: Wave-Insight Shell 
+use std::fs::OpenOptions;
+use std::io::Write;
 use std::process;
 use colored::Colorize;
 use molt::{molt_ok,molt_err};
@@ -127,6 +129,17 @@ const CMD_OPEN_VCD: CommandFunc = |shell: &mut Interp, ctx_id: ContextID, argv: 
 const CMD_TEST: CommandFunc = |shell: &mut Interp, ctx_id: ContextID, _: &[Value]| -> MoltResult {
     let context = shell.context::<AppContext>(ctx_id);
     println!("{:?}",context);
+    println!();
+    if let Some(s) = &context.structure{
+        // println!("{:?}",s.to_bincode());
+        if let Ok(ref mut file) = OpenOptions::new()
+            .write(true)
+            .open("bincode1"){
+                let e =file.write_all(&s.to_bincode());
+                println!("{:?}",e)
+            };
+            
+    }
     molt_ok!()
 };
 
