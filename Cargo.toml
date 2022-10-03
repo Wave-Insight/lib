@@ -3,4 +3,7 @@
 members = [
     "lib",
     "wave-insight",
+    "dev",
+    "web",
+    "server"
 ]
