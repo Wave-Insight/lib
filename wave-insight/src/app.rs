@@ -1,176 +1,139 @@
-use std::{
-    path::Path,
-    process,
-};
-use clap::{Command, Arg, ArgMatches};
-// use molt::{Interp, ContextID, Value};
-// use molt::check_args;
-use molt::{molt_ok,molt_err};
-use molt::Interp;
-use molt::types::*;
+// use std::time::Instant;
 
+use std::process;
+use hashbrown::HashMap;
+use actix_web::{App, HttpResponse, HttpServer, get, HttpRequest, web};
+use actix::{Actor, StreamHandler, Addr};
+// use actix::{Actor, StreamHandler, ActorContext};
+use actix_web_actors::ws::{WebsocketContext, self, Message};
+use actix_web_static_files::ResourceFiles;
 use colored::Colorize;
-use wave_insight_lib::structure;
-use crate::wish;
-/// Print greeting infomation
-#[allow(missing_debug_implementations)]
-pub struct App{
-    /// info: AppInfo,
-    pub wish: wish::Wish,
-    /// info: AppInfo,
-    pub args: ArgMatches,
-}
+use uuid::Uuid;
 
-impl App {
-    const DEFAULT_TCL_SCRIPT: &str = "wave-insight.tcl";
-    /// Print greeting infomation
-    pub fn init()->Self{
-        let args = Command::new(INFO.name)
-            .bin_name("wave-insight")
-            .version(INFO.version)
-            .about("A better open source wave viewer.")
-            .subcommand_required(false)
-            .arg(Arg::new("input_file")
-                .short('f')
-                .long("file")
-                .value_name("FILE")
-                .value_parser(clap::value_parser!(String))
-                .help("Provides an input wave file to the program")
-            )
-            .arg(Arg::new("tcl_script")
-                .short('s')
-                .long("script")
-                .value_name("FILE")
-                .default_value(Self::DEFAULT_TCL_SCRIPT)
-                .value_parser(clap::value_parser!(String))
-                .help("Provides a TCL script file to the program")
-            )
-            .arg(Arg::new("token")
-                .short('t')
-                .long("token")
-                .value_name("STRING")
-                // .default_value(Self::DEFAULT_TCL_SCRIPT)
-                .value_parser(clap::value_parser!(String))
-                .help("Provides an auth token")
-            )
-            .arg(Arg::new("port")
-                .short('p')
-                .long("port")
-                .value_name("PORT")
-                .value_parser(clap::value_parser!(u16).range(3000..))
-                // .action(ArgAction::Set)
-                .help("Provides a port number for http")
-            )
-            .get_matches();
-        Self{
-            wish: wish::Wish::init(),
-            args,
+
+
+
+
+struct WsRequest {
+    cmd: String,
+    data: String,
+}
+impl WsRequest {
+    fn new(cmd: &str, data: &str) -> Self {
+        Self {
+            cmd: cmd.to_string(),
+            data: data.to_string(),
         }
     }
-    /// # matech
-    /// 
-    /// Matech flags with input argu
-    #[inline]
-    pub fn matech_args(&mut self) {
-        if let Some(file_path) = self.args.get_one::<String>("tcl_script"){
-            if Path::new(file_path).exists(){
-                self.greeting();
-                self.wish.have_greeting = true;
-                println!();
-                if file_path == Self::DEFAULT_TCL_SCRIPT{
-                    println!("{} | Executing {} TCL script: '{}'", INFO.name.bold(), "default".underline().bold(), file_path);
-                } else {
-                    println!("{} | Executing TCL script: '{}'", INFO.name.bold(), file_path);
+    fn from_str(text: &str) -> Self {
+        let text = text.trim();
+        let mut splitn_result = text.splitn(2, ".");
+        let cmd = splitn_result.next().unwrap();
+        let data = splitn_result.next();
+        if let Some(data) = data {
+            Self::new(cmd, data)
+        } else {
+            Self::new(cmd, "")
+        }
+    }
+}
+
+lazy_static::lazy_static!{
+    static ref CMD_MAP: HashMap<&'static str, fn(addr: Addr<WsConn>, data: String)> = HashMap::new();
+}
+
+// #[derive(Message)]
+// #[rtype(result = "()")]
+// pub struct SayHello {
+//     pub from: &'static str,
+//     pub data: String,
+// }
+
+// #[derive(Message)]
+// #[rtype(result = "()")]
+// pub struct Say {
+//     pub from: &'static str,
+//     pub data: String,
+// }
+
+
+
+struct WsConn {
+    id: Uuid
+}
+
+impl Actor for WsConn {
+    type Context = WebsocketContext<Self>;
+
+    /// 连接上
+    fn started(&mut self, _: &mut Self::Context) {
+        println!("{} join!", self.id);
+        // println!("{:?}", ctx.address());
+    }
+
+    /// 断开连接
+    fn stopped(&mut self, _: &mut Self::Context) {
+        println!("{} exit!", self.id);
+    }
+}
+
+impl StreamHandler<Result<Message, ws::ProtocolError>> for WsConn {
+    fn handle(&mut self, item: Result<Message, ws::ProtocolError>, ctx: &mut Self::Context) {
+        match item {
+            Ok(Message::Text(text)) => {
+                ctx.text(text)
+            },
+            Ok(Message::Ping(msg)) => ctx.pong(&msg),
+            Ok(Message::Binary(bin)) => ctx.binary(bin),
+            Ok(Message::Close(reason)) => ctx.close(reason),
+            _ => (),
+        }
+    }
+}
+
+#[get("/ws")]
+async fn websocket(
+    // params: web::Path<String>,
+    req: HttpRequest,
+    stream: web::Payload,
+) -> HttpResponse {
+    
+    // let mut map = req.app_data::<HashMap<&str, &str>>().unwrap();
+    let conn = WsConn {
+        id: Uuid::new_v4()
+    };
+    // let mut my_data = data.lock().unwrap();
+    let resp = actix_web_actors::ws::start(conn, &req, stream);
+    match resp {
+        Ok(ret) => ret,
+        Err(e) => e.error_response(),
+    }
+}
+
+/// 启动服务器
+pub(crate) async fn create_app() {
+    let (addr, port) = ("0.0.0.0", 8080);
+    // let map: HashMap<&str, &str> = HashMap::new();
+
+    match HttpServer::new(move || {
+        let generated = generate::generate();
+        App::new()
+            .service(websocket)
+            .service(ResourceFiles::new("/", generated))
+        }).bind(format!("{}:{}", addr, port))
+        {
+            Ok(server)=>{
+                if port==80{
+                    println!("{} Listen at http://{}", "Running:".green().bold(), addr);
+                }else{
+                    println!("{} Listen at http://{}:{}", "Running:".green().bold(), addr, port);
                 }
-                self.wish.script(&vec![file_path.to_owned()][0..]);
-            } else if file_path != Self::DEFAULT_TCL_SCRIPT {
-                eprintln!("{} No such tcl script file: {}", "error:".red().bold(), file_path);
+                let _ = server.run().await;
+            },
+            Err(e) =>{
+                eprintln!("{} {}", "error:".red().bold(), e);
                 process::exit(1);
             }
-        }
-        // self.args.
-        if let Some(file_path) = self.args.get_one::<String>("input_file"){
-            if Path::new(file_path).exists(){
-                self.greeting();
-                self.wish.have_greeting = true;
-                println!();
-                println!("{} | Open VCD file: '{}'", INFO.name.bold(), file_path);
-                let _ = open_vcd(&mut self.wish.shell, self.wish.ctx_id, file_path);
-            } else if file_path != Self::DEFAULT_TCL_SCRIPT {
-                eprintln!("{} No such input file: {}", "error:".red().bold(), file_path);
-                process::exit(1);
-            }
-        }
-        println!()
-    }
-    /// # greeting
-    /// 
-    /// Print greeting infomation
-    #[inline]
-    pub fn greeting(&self) {
-        if !self.wish.have_greeting {
-            println!("{}",format!("*** {} v{} -- {} ***", INFO.name, INFO.version, INFO.time).bold());
-            println!("  * Wave Insight Shell (WISH): Tcl Interpreter");
-            println!("  * {}", INFO.url);
-        }
-    }
-
-    /// # help
-    /// 
-    /// Print help infomation
-    #[inline]
-    pub fn help() {
-        println!("{}",format!("*** {} {} -- {} ***", INFO.name, INFO.version, INFO.time).bold());
-    }
-}
-
-/// Hello world example for Rust.
-pub const INFO: AppInfo = AppInfo{
-    name: "Wave-Insight",
-    version: env!("CARGO_PKG_VERSION"),
-    url: env!("CARGO_PKG_HOMEPAGE"),
-    // https://docs.rs/chrono/latest/chrono/format/strftime/
-    time: build_time::build_time_local!("%b %d, %Y"),
-};
-/// Hello world example for Rust.
-#[derive(Debug, Clone, Copy)]
-pub struct AppInfo{
-    /// Hello world example for Rust.
-    pub name: &'static str,
-    /// Hello world example for Rust.
-    pub version: &'static str,
-    /// Hello world example for Rust.
-    pub url: &'static str,
-    /// Hello world example for Rust.
-    pub time: &'static str,
-}
-/// Hello world example for Rust.
-#[derive(Debug)]
-pub struct AppContext {
-    /// Hello world example for Rust.
-    pub structure: Option<structure::Structure>,
-}
-impl AppContext {
-    /// New AppData
-    pub fn new() -> Self{
-        let structure = None;
-        Self{
-            structure,
-        }
-    }
-}
-
-/// # open_vcd
-/// 
-/// Open a .vcd (Value Change Dump) file, see Chapter 18 of [IEEE Std 1364™-2005](https://www.eg.bucknell.edu/~csci320/2016-fall/wp-content/uploads/2015/08/verilog-std-1364-2005.pdf)
-#[inline]
-pub fn open_vcd(app_shell: &mut Interp, app_id: ContextID, file_path: &str) -> MoltResult {
-    let context = app_shell.context::<AppContext>(app_id);
-    match wave_insight_lib::parser::vcd(file_path) {
-        Ok(c) => {
-            context.structure = Some(c.structure);
-            molt_ok!("ok")
-        },
-        Err(err) => molt_err!("{} {}: {}","error:".red().bold(),file_path, err),
-    }
+        };
+        
 }
